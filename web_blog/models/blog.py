@@ -8,11 +8,12 @@ __author__ = 'craig'
 
 
 class Blog(object):
-    def __init__(self, author, title, description, _id=None):
+    def __init__(self, author, author_id, title, description, _id=None):
         self.author = author
         self.title = title
         self.description = description
         self._id = uuid.uuid4().hex if _id is None else _id
+        self.author_id = author_id
 
     def new_post(self, title, content, date=datetime.datetime.utcnow()):
         post = Post(blog_id=self._id,
@@ -32,6 +33,7 @@ class Blog(object):
     def json(self):
         return {
             'author': self.author,
+            'author_id': self.author_id,
             'title': self.title,
             'description': self.description,
             'id': self._id
@@ -42,3 +44,9 @@ class Blog(object):
         blog_data = Database.find_one(collection='blogs',
                                       query={'id': id} )
         return cls(**blog_data)
+
+    @classmethod
+    def find_by_autor_id(cls, author_id):
+        blogs = Database.find(collection='blogs',
+                              query={'author_id': author_id})
+        return [cls(**blog) for blog in blogs]
